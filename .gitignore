@@ -15,6 +15,7 @@
 # vendor/
 
 .vscode/
+dist/
 
 mdns-cli
 mdns-cli.exe

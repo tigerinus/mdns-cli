@@ -1,5 +1,7 @@
 # mdns-cli
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/tigerinus/mdns-cli)](https://goreportcard.com/report/github.com/tigerinus/mdns-cli) [![goreleaser](https://github.com/tigerinus/mdns-cli/actions/workflows/release.yml/badge.svg)](https://github.com/tigerinus/mdns-cli/actions/workflows/release.yml)
+
 A cross-platform CLI for mdns
 
 ```text

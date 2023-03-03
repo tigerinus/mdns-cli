@@ -1,0 +1,123 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+project_name: mdns-cli
+before:
+  hooks:
+    - go run github.com/google/go-licenses@latest check . --disallowed_types=restricted
+    - go mod tidy
+    - go test -race -v ./...
+builds:
+  - id: mdns-cli-linux-amd64
+    binary: mdns-cli
+    hooks:
+      post:
+        - upx --best --lzma -v --no-progress "{{ .Path }}"
+    ldflags:
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.version={{.Version}}
+    tags:
+      - musl
+      - netgo
+      - osusergo
+    goos:
+      - linux
+    goarch:
+      - amd64
+  - id: mdns-cli-linux-arm64
+    binary: mdns-cli
+    hooks:
+      post:
+        - upx --best --lzma -v --no-progress "{{ .Path }}"
+    ldflags:
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.version={{.Version}}
+    tags:
+      - musl
+      - netgo
+      - osusergo
+    goos:
+      - linux
+    goarch:
+      - arm64
+  - id: mdns-cli-linux-arm-7
+    binary: mdns-cli
+    hooks:
+      post:
+        - upx --best --lzma -v --no-progress "{{ .Path }}"
+    ldflags:
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.version={{.Version}}
+    tags:
+      - musl
+      - netgo
+      - osusergo
+    goos:
+      - linux
+    goarch:
+      - arm
+    goarm:
+      - "7"
+  - id: mdns-cli-windows-amd64
+    binary: mdns-cli
+    hooks:
+      post:
+        - upx --best --lzma -v --no-progress "{{ .Path }}"
+    ldflags:
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.version={{.Version}}
+    goos:
+      - windows
+    goarch:
+      - amd64
+  - id: mdns-cli-macos-aarch64
+    binary: mdns-cli
+    hooks:
+      post:
+        - upx --best --lzma -v --no-progress "{{ .Path }}"
+    ldflags:
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.version={{.Version}}
+    goos:
+      - darwin
+    goarch:
+      - arm64
+archives:
+  - name_template: "{{ .Os }}-{{ .Arch }}-{{ .ProjectName }}-v{{ .Version }}"
+    id: mdns-cli
+    builds:
+      - mdns-cli-linux-amd64
+      - mdns-cli-linux-arm64
+      - mdns-cli-linux-arm-7
+      - mdns-cli-macos-aarch64
+    files:
+      - mdns-cli*
+  - name_template: "{{ .Os }}-{{ .Arch }}-{{ .ProjectName }}-v{{ .Version }}"
+    id: mdns-cli.exe
+    builds:
+      - mdns-cli-windows-amd64
+    format: zip
+    files:
+      - mdns-cli*
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ incpatch .Version }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+release:
+  github:
+    owner: tigerinus
+    name: mdns-cli
+  draft: true
+  prerelease: auto
+  mode: replace
+  name_template: "v{{ .Version }}"
