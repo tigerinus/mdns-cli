@@ -1,6 +1,5 @@
-The MIT License (MIT)
-
-Copyright © 2023 Tiger Wang <tiger@tensorsmart.com>
+/*
+Copyright © 2023 tigerinus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +18,41 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+*/
+package cmd
+
+import (
+	"github.com/hashicorp/mdns"
+	"github.com/spf13/cobra"
+)
+
+// browseCmd represents the browse command
+var browseCmd = &cobra.Command{
+	Use: "browse",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		entries := make(chan *mdns.ServiceEntry, 0)
+		defer close(entries)
+
+		go func() {
+			for entry := range entries {
+				cmd.Println(entry)
+			}
+		}()
+
+		return mdns.Lookup("_smb._tcp", entries)
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(browseCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// browseCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// browseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}

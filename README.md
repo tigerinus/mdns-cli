@@ -1,2 +1,3 @@
-# mdns-utils
-A cross-platform set of mDNS utils
+# mdns-cli
+
+A cross-platform CLI for mdns
