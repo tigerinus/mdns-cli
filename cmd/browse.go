@@ -35,7 +35,9 @@ const lastUpdatedKey = "lastUpdated"
 
 // browseCmd represents the browse command
 var browseCmd = &cobra.Command{
-	Use: "browse",
+	Use:     "browse",
+	Short:   "Browse for services and instances for each service",
+	GroupID: RootGroupID,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		resolver, err := zeroconf.NewResolver(nil)
 		if err != nil {
