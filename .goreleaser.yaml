@@ -95,8 +95,6 @@ archives:
       - mdns-cli-linux-arm-7
       - mdns-cli-windows-amd64
       - mdns-cli-macos-aarch64
-    replacements:
-      arm: arm-7
     files:
       - mdns-cli*
   - name_template: "{{ .Os }}-{{ .Arch }}-{{ .ProjectName }}-v{{ .Version }}"
