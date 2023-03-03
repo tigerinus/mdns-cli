@@ -93,7 +93,6 @@ archives:
       - mdns-cli-linux-amd64
       - mdns-cli-linux-arm64
       - mdns-cli-linux-arm-7
-      - mdns-cli-windows-amd64
       - mdns-cli-macos-aarch64
     files:
       - mdns-cli*
