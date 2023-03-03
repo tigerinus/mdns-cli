@@ -27,6 +27,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	RootGroupID = "mdns-cli"
+)
+
+var (
+	Version string
+	Commit  string
+	Date    string
+)
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use: "mdns-cli",
@@ -46,5 +56,8 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize()
+	rootCmd.AddGroup(&cobra.Group{
+		ID:    RootGroupID,
+		Title: "Commands",
+	})
 }
