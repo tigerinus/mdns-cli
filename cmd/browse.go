@@ -22,25 +22,102 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"github.com/hashicorp/mdns"
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
+	"github.com/grandcat/zeroconf"
 	"github.com/spf13/cobra"
 )
+
+const lastUpdatedKey = "lastUpdated"
 
 // browseCmd represents the browse command
 var browseCmd = &cobra.Command{
 	Use: "browse",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		entries := make(chan *mdns.ServiceEntry, 0)
-		defer close(entries)
+		resolver, err := zeroconf.NewResolver(nil)
+		if err != nil {
+			return err
+		}
+
+		lastUpdated := time.Now()
+
+		ctx := context.WithValue(cmd.Context(), lastUpdatedKey, &lastUpdated)
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
 
 		go func() {
-			for entry := range entries {
-				cmd.Println(entry)
+			for {
+				select {
+				case <-ctx.Done():
+					break
+				case <-time.After(1 * time.Second):
+					lastUpdated := ctx.Value(lastUpdatedKey).(*time.Time)
+					if time.Since(*lastUpdated) > 10*time.Second {
+						cancel()
+					}
+				}
 			}
 		}()
 
-		return mdns.Lookup("_smb._tcp", entries)
+		services := make(chan *zeroconf.ServiceEntry)
+
+		go discoverServices(ctx, services, dicoverServiceEntries)
+
+		if err := resolver.Browse(ctx, "_services._dns-sd._udp", "", services); err != nil {
+			return err
+		}
+
+		<-ctx.Done()
+
+		return nil
 	},
+}
+
+func discoverServices(ctx context.Context, services chan *zeroconf.ServiceEntry, handle func(ctx context.Context, service, domain string)) {
+	for {
+		select {
+		case <-ctx.Done():
+			break
+		case service := <-services:
+			go handle(ctx, service.Instance, service.Domain)
+		}
+	}
+}
+
+func dicoverServiceEntries(ctx context.Context, service string, domain string) {
+	service = strings.TrimSuffix(service, ".local")
+
+	resolver, err := zeroconf.NewResolver(nil)
+	if err != nil {
+		fmt.Printf("error when creating a new resolver: %s\n", err.Error())
+	}
+
+	entries := make(chan *zeroconf.ServiceEntry)
+
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				break
+			case entry, ok := <-entries:
+				if !ok {
+					break
+				}
+
+				fmt.Printf("%s:\t%s\n", service, entry.Instance)
+
+				lastUpdated := ctx.Value(lastUpdatedKey).(*time.Time)
+				*lastUpdated = time.Now()
+			}
+		}
+	}()
+
+	if err := resolver.Browse(ctx, service, domain, entries); err != nil {
+		fmt.Printf("error when browsing for service entries: %s\n", err.Error())
+	}
 }
 
 func init() {
