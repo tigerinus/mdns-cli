@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 Tiger Wang <tiger@tensorsmart.com>
+Copyright © 2023 tigerinus
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,21 +19,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package main
+package cmd
 
-import "github.com/tigerinus/mdns-cli/cmd"
+import (
+	"fmt"
 
-var (
-	// see https://goreleaser.com/cookbooks/using-main.version
-	version = "unknown"
-	commit  = "unknown"
-	date    = "unknown"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	cmd.Version = version
-	cmd.Commit = commit
-	cmd.Date = date
+// versionCmd represents the version command
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Show version",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(Version)
+		fmt.Printf("(build time: %s, commit: %s)\n", Date, Commit)
+	},
+}
 
-	cmd.Execute()
+func init() {
+	rootCmd.AddCommand(versionCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// versionCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// versionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
