@@ -83,7 +83,11 @@ func discoverServices(ctx context.Context, services chan *zeroconf.ServiceEntry,
 		select {
 		case <-ctx.Done():
 			break
-		case service := <-services:
+		case service, ok := <-services:
+			if !ok || service == nil {
+				break
+			}
+
 			go handle(ctx, service.Instance, service.Domain)
 		}
 	}
