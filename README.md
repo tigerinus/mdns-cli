@@ -4,6 +4,12 @@
 
 A cross-platform CLI for mdns
 
+## Motivation
+
+There is no `avahi-browse` under Windows, so I had to create one myself.
+
+## Usage
+
 ```text
 Usage:
   mdns-cli [command]
